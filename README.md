@@ -4,7 +4,7 @@ Bayesian Separation of Close Sources
 
 Samples from the joint posterior distribution of the number of sources and their spatial and spectral parameters.
 
-NOTE: we are currently correctly some errors that occur when there is only one source detected. We will also shortly provide additional examples to illustrate the method. 
+NOTE: we are currently correcting some errors that occur when there is only one source detected. We will also shortly provide additional examples to illustrate the method. 
 
 References: 
 
