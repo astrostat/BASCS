@@ -8,7 +8,11 @@ log_accept_split_extended_full_type1 <- function(k,mu,newmu,allocate,newallocate
   mupart <- log(1/img_area)
   
   # Spectral parameters log prior ratio
-  epart <- sum(log(dgamma(neweps[,3:4],ashape,arate))) - 2*log(emean.range) - sum(log(dgamma(oldeps[,3:4],ashape,arate))) 
+  if (k > 1){
+    epart <- sum(log(dgamma(neweps[,3:4],ashape,arate))) - 2*log(emean.range) - sum(log(dgamma(oldeps[,3:4],ashape,arate))) 
+  } else {
+    epart <- sum(log(dgamma(neweps[3:4],ashape,arate))) - 2*log(emean.range) - sum(log(dgamma(oldeps[3:4],ashape,arate))) 
+  }
   
   # Spectral model weight parameter log prior ratio
   ewt_part <- sum(log(dbeta(newew,ewt_ab,ewt_ab)))-sum(log(dbeta(oldew,ewt_ab,ewt_ab)))
@@ -25,10 +29,22 @@ log_accept_split_extended_full_type1 <- function(k,mu,newmu,allocate,newallocate
   # (Note in both the combine and split moves the sources are ordered so source 1 has the smaller first gamma component 
   # - this meets the requirement that there is only one way to complete the proposed move)
   bk <- ifelse(k==1,1,0.25)/k # one source is chosen and split
-  if (sum((newmu[,ind1]-newmu[,ind2])^2) < min(min(apply((newmu[,ind2]-mu[,-indold])^2,2,sum)),min(apply((newmu[,ind1]-mu[,-indold])^2,2,sum)))){
-    dk1 <- 0.25*2/(k+1) # if mu1 and mu2 are mutually closest neighbours then there is double the probability of choosing this pair to combine
-  } else {
-    dk1 <- 0.25*1/(k+1)
+  if (k>2){
+    if (sum((newmu[,ind1]-newmu[,ind2])^2) < min(min(apply((newmu[,ind2]-mu[,-indold])^2,2,sum)),min(apply((newmu[,ind1]-mu[,-indold])^2,2,sum)))){
+      dk1 <- 0.25*2/(k+1) # if mu1 and mu2 are mutually closest neighbours then there is double the probability of choosing this pair to combine
+    } else {
+      dk1 <- 0.25*1/(k+1)
+    }
+  } 
+  if (k==2){
+    if (sum((newmu[,ind1]-newmu[,ind2])^2) < min(sum((newmu[,ind2]-mu[,-indold])^2),sum(newmu[,ind1]-mu[,-indold])^2)){
+      dk1 <- 0.25*2/(k+1) # if mu1 and mu2 are mutually closest neighbours then there is double the probability of choosing this pair to combine
+    } else {
+      dk1 <- 0.25*1/(k+1)
+    }
+  }
+  if (k==1){
+    dk1 <- 0.25
   }
   
   # Deal with empty sources
@@ -46,7 +62,12 @@ log_accept_split_extended_full_type1 <- function(k,mu,newmu,allocate,newallocate
                                                        # v2 and v3 give no contribution
                                                        # t (i.e. ewt1) gives no contribution
   
-  jacobian <- log(split_jacobian((newew[ind1]-ewt1.range[1])/(ewt1.range[2]-ewt1.range[1]), oldew[indold], oldeps[indold,1], oldeps[indold,2], oldeps[indold,3], oldeps[indold,4], us[4], us[5], us[6], us[7], wt[indold], mu[1,indold],mu[2,indold], us[1], us[2], us[3]))
+  if (k > 1){
+    jacobian <- log(split_jacobian((newew[ind1]-ewt1.range[1])/(ewt1.range[2]-ewt1.range[1]), oldew[indold], oldeps[indold,1], oldeps[indold,2], oldeps[indold,3], oldeps[indold,4], us[4], us[5], us[6], us[7], wt[indold], mu[1,indold],mu[2,indold], us[1], us[2], us[3]))
+  } else {
+    jacobian <- log(split_jacobian((newew[ind1]-ewt1.range[1])/(ewt1.range[2]-ewt1.range[1]), oldew[indold], oldeps[1], oldeps[2], oldeps[3], oldeps[4], us[4], us[5], us[6], us[7], wt[indold], mu[1],mu[2], us[1], us[2], us[3]))
+  }
+  
   # Parameter order: (t, ej, g.j1, g.j2, a.j1, a.j2, v2,v3, v4, v5, wj, mu.j1, mu.j2, u1, u2, u3)
   
   value <- like_part + mupart + epart + ewt_part + kpart + wcon_part + proppart + jacobian

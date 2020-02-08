@@ -99,17 +99,17 @@ combine_type1 <- function(w,allocate_curr,mu_curr,eparas,ewt,k_curr,mix_num,com.
     # sum(allocate_curr[indcom,pick]*log(probs.old)) + sum(allocate_curr[indcom,pick2]*log(1-probs.old))
     # sum(allocate_curr[indcom,pick]*log(probs[pick,indcom])) + sum(allocate_curr[indcom,pick2]*log(1-probs[pick2,indcom]))
     # Acceptance probability
-    split.index <- which(eps.new[,1]==gam.com.mean1)
+    split.index <- ifelse(k_curr>2,which(eps.new[,1]==gam.com.mean1),1)
     A <- exp(-log_accept_split_extended_full_type1(k_curr-1,mu.new,mu_curr,allocate.new,allocate_curr,pick,pick2,eps.new,eparas,ewt.new,ewt,split.index,w.new,w,probs.old,c(u1,u2,u3,v2,v3,v4,v5),ewt1.range))
     
     utest <- runif(1,0,1)
     if (is.na(A)==0){
       if (utest < A){
-        w <- w.new
+        w <- matrix(w.new,1,k_curr)
         allocate_curr <- allocate.new
-        mu_curr <- mu.new
-        eparas <- eps.new
-        ewt <- ewt.new
+        mu_curr <- matrix(mu.new,2,k_curr-1)
+        eparas <- matrix(eps.new,k_curr-1,4)
+        ewt <- matrix(ewt.new,1,k_curr-1)
         k_curr <- k_curr-1
         mix_num <- k_curr +1
       }

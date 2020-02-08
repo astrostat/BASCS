@@ -79,7 +79,16 @@ split_type1 <- function(w,allocate_curr,mu_curr,eparas,ewt,k_curr,mix_num,count_
     
     # Test of conditions
     # Check if positions are closest
-    if (sum((mu1-mu2)^2) < min(apply((mu1-mu_curr[,-pick])^2,2,sum))){
+    if (length(mu_curr[1,])>2){
+      distance_condition <- sum((mu1-mu2)^2) < min(apply((mu1-mu_curr[,-pick])^2,2,sum))
+    }
+    if (length(mu_curr[1,])==2){
+      distance_condition <- sum((mu1-mu2)^2) < sum((mu1-mu_curr[,-pick])^2)
+    }
+    if (length(mu_curr[1,])==1){
+      distance_condition <- 1
+    }
+    if (distance_condition){
       fail_reason <- 3
       # Check second small component is less than the second large component 
       # Also check that all the means are within the prior support

@@ -28,7 +28,16 @@ split_type2 <- function(w,allocate_curr,mu_curr,eparas,ewt,k_curr,mix_num,count_
   mu2 <- c(mu.com[1] + u2*sqrt(sigma[1,1]*u1/(1-u1)),mu.com[2] + u3*sqrt(sigma[1,1]*u1/(1-u1))) 
   
   # Check if mu2 is closest source to mu1, and if the positions are within the range of the data
-  if ((sum((mu1-mu2)^2) < min(apply((mu1-mu_curr[,-pick])^2,2,sum))) & (max(mu1[1],mu2[1]) < xup) & (min(mu1[1],mu2[1]) > xlow) & (max(mu1[2],mu2[2]) < yup) & (min(mu1[2],mu2[2]) > ylow)){
+  if (length(mu_curr[1,])>2){
+    distance_condition <- sum((mu1-mu2)^2) < min(apply((mu1-mu_curr[,-pick])^2,2,sum))
+  }
+  if (length(mu_curr[1,])==2){
+    distance_condition <- sum((mu1-mu2)^2) < sum((mu1-mu_curr[,-pick])^2)
+  }
+  if (length(mu_curr[1,])==1){
+    distance_condition <- 1
+  }
+  if (distance_condition & (max(mu1[1],mu2[1]) < xup) & (min(mu1[1],mu2[1]) > xlow) & (max(mu1[2],mu2[2]) < yup) & (min(mu1[2],mu2[2]) > ylow)){
     fail_reason <- NA
     
     ##############################

@@ -51,10 +51,12 @@ mcmc.extended.full <- function(fix_runs,online_ordering,rjmcmc_run,w,allocate_cu
       to_order <- min(no_guess,k_curr)
       next_index <- which.min(apply((mu_curr-mu_guess[,1])^2,2,sum))
       next_index_store <- next_index
-      for (i in 2:to_order){
-        next_order <- order(apply((mu_curr-mu_guess[,i])^2,2,sum))
-        next_index_all <- setdiff(next_order,next_index_store)
-        next_index_store <- c(next_index_store,next_index_all[1])
+      if (to_order > 1){
+        for (i in 2:to_order){
+          next_order <- order(apply((mu_curr-mu_guess[,i])^2,2,sum))
+          next_index_all <- setdiff(next_order,next_index_store)
+          next_index_store <- c(next_index_store,next_index_all[1])
+        }
       }
       indexmu <- c(next_index_store,setdiff(1:k_curr,next_index_store))
       mu_curr <- mu_curr[,indexmu]
@@ -102,16 +104,19 @@ mcmc.extended.full <- function(fix_runs,online_ordering,rjmcmc_run,w,allocate_cu
       }
     }
     # Order Gammas for identifiability and combine conditions
-    epara_order <- apply(eparas[,c(1,2)],1,order)
-    epara_order_all <- rbind(epara_order,epara_order+2)
-    for (i in 1:k_curr){
-      eparas[i,] <- eparas[i,epara_order_all[,i]] 
-    }
-    for (i in 1:k_curr){
-      if (sum(epara_order[,i] != c(1,2))>0){
-        ewt[i] <- 1- ewt[i]
+    if (k_curr > 1){
+      epara_order <- apply(eparas[,c(1,2)],1,order)
+      epara_order_all <- rbind(epara_order,epara_order+2)
+      for (i in 1:k_curr){
+        eparas[i,] <- eparas[i,epara_order_all[,i]] 
+      }
+      for (i in 1:k_curr){
+        if (sum(epara_order[,i] != c(1,2))>0){
+          ewt[i] <- 1- ewt[i]
+        }
       }
     }
+
     
   }
   
