@@ -4,8 +4,6 @@ Bayesian Separation of Close Sources
 
 Samples from the joint posterior distribution of the number of sources and their spatial and spectral parameters.
 
-NOTE: we are currently correcting some errors that occur when there is only one source detected. We will also shortly provide additional examples to illustrate the method. 
-
 References: 
 
 Jones, D. E., Kashyap, V. L., & van Dyk, D. A. (2015). Disentangling Overlapping Astronomical Sources using Spatial and Spectral Information. Astrophysical Journal, 808: 2, 137 -- 160.
